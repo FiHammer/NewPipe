@@ -447,28 +447,12 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
         Log.d("loadMoreItems", "end");
     }
 
-    protected ArrayList<String> sort(ArrayList<String> list) {
-        ArrayList<String> endlist = new ArrayList<>();
-        for (int x = 1; x < 61; x++) {
-            String name = " " + x;
-            while (list.contains(name)) {
-                endlist.add(name);
-                name = " " + x;
-            }
-        }
-        return endlist;
-    }
-
-    private ArrayList<String> makeAList(ArrayList<String> list) {
-        return list;
-    }
-
     protected void finishedFirstLoad() {
-        ArrayList<String> secsArr = new ArrayList<>();
+        ArrayList<Integer> secsArr = new ArrayList<>();
         Map<String, StreamInfoItem> secsMap = new HashMap<>();
-        ArrayList<String> minsArr = new ArrayList<>();
+        ArrayList<Integer> minsArr = new ArrayList<>();
         Map<String, StreamInfoItem> minsMap = new HashMap<>();
-        ArrayList<String> hrsArr = new ArrayList<>();
+        ArrayList<Integer> hrsArr = new ArrayList<>();
         Map<String, StreamInfoItem> hrsMap = new HashMap<>();
 
         // sort for time type
@@ -477,22 +461,31 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
             String uploadDate = item.getUploadDate();
             String newDate = uploadDate.split(" ")[1] + " ";
             if (uploadDate.contains(space_secs) || uploadDate.equals(before_1_sec)) {
-                while (secsArr.contains(newDate)) {
+                while (secsMap.containsKey(newDate)) {
                     newDate += " ";
                 }
-                secsArr.add(newDate);
+                int numi = Integer.parseInt(newDate.split(" ")[0]);
+                if (!secsArr.contains(numi)) {
+                    secsArr.add(Integer.parseInt(newDate.split(" ")[0]));
+                }
                 secsMap.put(newDate, item);
             } else if (uploadDate.contains(space_mins) || uploadDate.equals(before_1_min)) {
-                while (minsArr.contains(newDate)) {
+                while (minsMap.containsKey(newDate)) {
                     newDate += " ";
                 }
-                minsArr.add(newDate);
+                int numi = Integer.parseInt(newDate.split(" ")[0]);
+                if (!minsArr.contains(numi)) {
+                    minsArr.add(numi);
+                }
                 minsMap.put(newDate, item);
             } else if (uploadDate.contains(space_hrs) || uploadDate.contains(before_1_hr)) {
-                while (hrsArr.contains(newDate)) {
+                while (hrsMap.containsKey(newDate)) {
                     newDate += " ";
                 }
-                hrsArr.add(newDate);
+                int numi = Integer.parseInt(newDate.split(" ")[0]);
+                if (!hrsArr.contains(numi)) {
+                    hrsArr.add(numi);
+                }
                 hrsMap.put(newDate, item);
             }
         }
@@ -507,21 +500,49 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
         //hrsArr = sort(hrsArr);
 
         // apply
-        for (String aNum: secsArr) {
-            infoListAdapter.addInfoItem(secsMap.get(aNum));
-        }for (String aNum: minsArr) {
-            infoListAdapter.addInfoItem(minsMap.get(aNum));
-        }for (String aNum: hrsArr) {
-            infoListAdapter.addInfoItem(hrsMap.get(aNum));
-        }
+        //ArrayList<Integer> lastNums = new ArrayList<>();
         /*
+        String myName;
+        for (Integer aNum: secsArr) {
+            myName = aNum + " ";
+            while (secsMap.containsKey(myName)) {
+                infoListAdapter.addInfoItem(secsMap.get(myName));
+                myName += " ";
+            }
+        }for (Integer aNum: minsArr) {
+            myName = aNum + " ";
+            while (secsMap.containsKey(myName)) {
+                infoListAdapter.addInfoItem(minsMap.get(myName));
+                myName += " ";
+            }
+        }for (Integer aNum: hrsArr) {
+            myName = aNum + " ";
+            while (secsMap.containsKey(myName)) {
+                infoListAdapter.addInfoItem(hrsMap.get(myName));
+                myName += " ";
+            }
+        }
+        */
         ArrayList<StreamInfoItem> lastList = new ArrayList<>();
-        for (String aNum: secsArr) {
-            lastList.add(secsMap.get(aNum));
-        }for (String aNum: minsArr) {
-            lastList.add(minsMap.get(aNum));
-        }for (String aNum: hrsArr) {
-            lastList.add(hrsMap.get(aNum));
+        String myName;
+        for (Integer aNum: secsArr) {
+            myName = aNum + " ";
+            while (secsMap.containsKey(myName)) {
+                lastList.add(secsMap.get(myName));
+                myName += " ";
+            }
+        }for (Integer aNum: minsArr) {
+            myName = aNum + " ";
+            while (minsMap.containsKey(myName)) {
+                lastList.add(minsMap.get(myName));
+                myName += " ";
+            }
+        }for (Integer aNum: hrsArr) {
+            myName = aNum + " ";
+            while (hrsMap.containsKey(myName)) {
+                lastList.add(hrsMap.get(myName));
+                myName += " ";
+            }
         }
 
         for (StreamInfoItem item: lastList) {
@@ -530,7 +551,6 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
 
 
         Log.d("END_ARRAY", lastList.toString());
-        */
         Log.d("END", "END");
 
     }
