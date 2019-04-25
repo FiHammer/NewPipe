@@ -67,8 +67,8 @@ import org.schabi.newpipe.util.ThemeHelper;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-    //public static final boolean DEBUG = !BuildConfig.BUILD_TYPE.equals("release");
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = !BuildConfig.BUILD_TYPE.equals("release");
+    //public static final boolean DEBUG = true;
 
     private ActionBarDrawerToggle toggle = null;
     private DrawerLayout drawer = null;
