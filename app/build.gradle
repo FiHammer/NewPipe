@@ -8,8 +8,8 @@ android {
         applicationId "org.schabi.newpipe"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 720
-        versionName "0.16.0"
+        versionCode 721
+        versionName "0.16.1"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -25,7 +25,7 @@ android {
         debug {
             multiDexEnabled true
             debuggable true
-            applicationIdSuffix ".debug"
+            applicationIdSuffix ".abobox"
         }
     }
 
@@ -40,6 +40,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
 }
 
 ext {
