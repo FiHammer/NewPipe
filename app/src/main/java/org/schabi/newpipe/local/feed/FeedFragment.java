@@ -1,3 +1,4 @@
+
 package org.schabi.newpipe.local.feed;
 
 import android.annotation.SuppressLint;
@@ -21,8 +22,10 @@ import org.schabi.newpipe.extractor.InfoItem;
 import org.schabi.newpipe.extractor.NewPipe;
 import org.schabi.newpipe.extractor.channel.ChannelInfo;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
+import org.schabi.newpipe.extractor.stream.Stream;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.fragments.list.BaseListFragment;
+import org.schabi.newpipe.local.holder.LocalPlaylistGridItemHolder;
 import org.schabi.newpipe.report.UserAction;
 import org.schabi.newpipe.local.subscription.SubscriptionService;
 
@@ -56,24 +59,25 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
     private ArrayList<ArrayList<String>> usedChannels;
     private Integer thisLoad;
     /*
-    * 0: 0      vor X Stunden
-    * 1: 1      vor 1 Tag
-    * 2: 2      vor 2 Tagen
-    * ....      vor X Tagen
-    * 6: 6      vor 6 Tagen
-    * 7: 7-13   vor 1 Woche
-    * 8: 14-20  vor 2 Wochen
-    * 9: 21-27  vor 3 Wochen
-    * 10: 28-X  vor 1 Monat
-    * Monat not supportet
-    * */
+     * 0: 0      vor X Stunden
+     * 1: 1      vor 1 Tag
+     * 2: 2      vor 2 Tagen
+     * ....      vor X Tagen
+     * 6: 6      vor 6 Tagen
+     * 7: 7-13   vor 1 Woche
+     * 8: 14-20  vor 2 Wochen
+     * 9: 21-27  vor 3 Wochen
+     * 10: 28-X  vor 1 Monat
+     * Monat not supportet
+     * */
 
     private String before_1_sec = "vor 1 Sekunde";
     private String space_secs = " Sekunden";
-    private String before_1_min = "vor 1 Minuten";
-    private String space_mins = " Minute";
+    private String before_1_min = "vor 1 Minute";
+    private String space_mins = " Minuten";
     private String before_1_hr = "vor 1 Stunde";
     private String space_hrs = " Stunden";
+    private String liveStream = "Zuschauer";
 
     private String[] loadParse = {"today", "vor 1 Tag", "vor 2 Tagen", "vor 3 Tagen", "vor 4 Tagen",
             "vor 5 Tagen", "vor 6 Tagen", "vor 1 Woche", "vor 2 Wochen", "vor 3 Wochen", "vor 1 Monat"};
@@ -404,7 +408,7 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
                     Log.d("MaybeObserver onDone", "end 0");
                     return;
                 }
-
+                Log.e("OK", "LETS GO");
                 itemsLoaded.add(serviceId + url);
                 compositeDisposable.remove(observer);
 
@@ -412,11 +416,12 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
                 //int loaded = requestLoadedAtomic.incrementAndGet();
                 //if (loaded >= Math.min(FEED_LOAD_COUNT, subscriptionPoolSize)) {
                 if (usedChannels.get(thisLoad).size() == subscriptionPoolSize) {
+                    Log.e("OK", "LETS HARD");
                     finishedFirstLoad();
                     requestLoadedAtomic.set(0);
                     isLoading.set(false);
                 }
-
+                Log.e("OK", "LETS GOING");
                 // finished with everything
                 //if (itemsLoaded.size() == subscriptionPoolSize) {
                 if (thisLoad == 10 && usedChannels.get(10).size() == subscriptionPoolSize) {
@@ -429,6 +434,7 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
                         showEmptyState();
                     }
                 }
+                Log.e("OK", "LETS GONE");
                 Log.d("MaybeObserver onDone", "end 1");
             }
         };
@@ -448,6 +454,7 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
     }
 
     protected void finishedFirstLoad() {
+        // SORTS
         ArrayList<Integer> secsArr = new ArrayList<>();
         Map<String, StreamInfoItem> secsMap = new HashMap<>();
         ArrayList<Integer> minsArr = new ArrayList<>();
@@ -455,12 +462,21 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
         ArrayList<Integer> hrsArr = new ArrayList<>();
         Map<String, StreamInfoItem> hrsMap = new HashMap<>();
 
+        ArrayList<StreamInfoItem> streamArr = new ArrayList<>();
         // sort for time type
 
+        Log.e("AHA", "STEP ONE");
         for (StreamInfoItem item: todayItems) {
             String uploadDate = item.getUploadDate();
-            String newDate = uploadDate.split(" ")[1] + " ";
+            String[] parts = uploadDate.split(" ");
+            if (parts.length == 1) { // STREAMS
+                streamArr.add(item);
+                continue;
+            }
+
+            String newDate = parts[1] + " ";
             if (uploadDate.contains(space_secs) || uploadDate.equals(before_1_sec)) {
+                Log.e("items", "Ok 1");
                 while (secsMap.containsKey(newDate)) {
                     newDate += " ";
                 }
@@ -470,6 +486,7 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
                 }
                 secsMap.put(newDate, item);
             } else if (uploadDate.contains(space_mins) || uploadDate.equals(before_1_min)) {
+                Log.e("items", "Ok 2");
                 while (minsMap.containsKey(newDate)) {
                     newDate += " ";
                 }
@@ -479,6 +496,7 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
                 }
                 minsMap.put(newDate, item);
             } else if (uploadDate.contains(space_hrs) || uploadDate.contains(before_1_hr)) {
+                Log.e("items", "Ok 3");
                 while (hrsMap.containsKey(newDate)) {
                     newDate += " ";
                 }
@@ -490,6 +508,7 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
             }
         }
         // sort for numbers
+        Log.e("AHA", "STEP Two");
 
         Collections.sort(secsArr);
         Collections.sort(minsArr);
@@ -523,8 +542,10 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
             }
         }
         */
-        ArrayList<StreamInfoItem> lastList = new ArrayList<>();
+        Log.e("AHA", "STEP ThREE");
         String myName;
+        ArrayList<StreamInfoItem> lastList = new ArrayList<>(streamArr);
+
         for (Integer aNum: secsArr) {
             myName = aNum + " ";
             while (secsMap.containsKey(myName)) {
@@ -597,10 +618,19 @@ public class FeedFragment extends BaseListFragment<List<SubscriptionEntity>, Voi
 
         if (true) {
             if (thisLoad == 0) { // today
-                while ((uploadDate.equals(before_1_sec) || uploadDate.endsWith(space_secs) ||
+                Log.e("FEED", "AM I HERE");
+                Log.e("FEED", "" + uploadDate.endsWith(liveStream));
+
+                if (channelInfo.getName().equals("Nerd Over News")) {
+                    Log.e("FEED", "NERDI");
+                }
+
+                while ((uploadDate.endsWith(liveStream) ||
+                        uploadDate.equals(before_1_sec) || uploadDate.endsWith(space_secs) ||
                         uploadDate.equals(before_1_min) || uploadDate.endsWith(space_mins) ||
                         uploadDate.equals(before_1_hr) || uploadDate.endsWith(space_hrs)) && channelInfo.getRelatedItems().size() > num) {
 
+                    Log.e("FEED", "AM I HERE TOO");
                     //add to list
                     if (!doesItemExist(infoListAdapter.getItemsList(), item)) {
                         Log.d("Feeder", "Adding the item: " + item.getName());

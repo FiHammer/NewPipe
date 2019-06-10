@@ -68,7 +68,6 @@ import org.schabi.newpipe.util.ThemeHelper;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     public static final boolean DEBUG = !BuildConfig.BUILD_TYPE.equals("release");
-    //public static final boolean DEBUG = true;
 
     private ActionBarDrawerToggle toggle = null;
     private DrawerLayout drawer = null;
@@ -221,7 +220,6 @@ public class MainActivity extends AppCompatActivity {
                 NavigationHelper.openSubscriptionFragment(getSupportFragmentManager());
                 break;
             case ITEM_ID_FEED:
-                Log.e("HI", "Gefeeded");
                 NavigationHelper.openWhatsNewFragment(getSupportFragmentManager());
                 break;
             case ITEM_ID_BOOKMARKS:

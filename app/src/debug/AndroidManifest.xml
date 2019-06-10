@@ -6,7 +6,7 @@
 
     <application
         android:name=".DebugApp"
-        android:label="NewPipe Abobox"
+        android:label="NewPipe Debug"
         tools:replace="android:name, android:label">
         <activity
             android:name=".MainActivity"
